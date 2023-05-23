@@ -1,0 +1,7 @@
+{
+  "num_qubits": 5,
+  "approximation_degree": 2,
+  "do_swaps": true,
+  "inverse": false,
+  "insert_barriers": false
+}
