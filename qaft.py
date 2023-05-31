@@ -1,6 +1,9 @@
 import numpy as np
 
 from qiskit.circuit import QuantumCircuit
+from qiskit.circuit.library import QFT
+from qiskit import Aer, transpile, execute
+from qiskit.quantum_info import state_fidelity
 from typing import Optional
 
 
@@ -29,8 +32,6 @@ def qaft(
         circuit.h(j)
         num_entanglements = max(0, j - max(0, approximation_degree - (num_qubits - j - 1)))
         for k in reversed(range(j - num_entanglements, j)):
-            # Use negative exponents so that the angle safely underflows to zero, rather than
-            # using a temporary variable that overflows to infinity in the worst case.
             lam = np.pi * (2.0 ** (k - j))
             circuit.cp(lam, j, k)
 
@@ -46,5 +47,21 @@ def qaft(
 
     qasm_result = circuit.decompose().qasm()
 
-    return qasm_result
+    # AQFT simulation
+    backend = Aer.get_backend('aer_simulator_statevector')
+    result = execute(circuit, backend).result()
+    state_vector = result.get_statevector()
+
+    # Perfect QFT simulation
+    perfect_qft = QFT(num_qubits=num_qubits, approximation_degree=0, do_swaps=do_swaps, inverse=inverse, insert_barriers=insert_barriers)
+
+    backend = Aer.get_backend('aer_simulator_statevector')
+    perfect_result = execute(perfect_qft, backend).result()
+    perfect_state_vector = perfect_result.get_statevector()
+
+    print(state_vector, perfect_state_vector)
+
+    fidelity = state_fidelity(state_vector, perfect_state_vector)
+
+    return qasm_result, fidelity
 
