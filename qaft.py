@@ -2,7 +2,7 @@ import numpy as np
 
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QFT
-from qiskit import Aer, transpile, execute
+from qiskit import Aer, execute
 from qiskit.quantum_info import state_fidelity
 from typing import Optional
 
@@ -40,7 +40,7 @@ def qaft(
 
     if do_swaps:
         for i in range(num_qubits // 2):
-            circuit.swap(i, num_qubits - i - 1)
+            circuit.swap(i, num_qubits-i - 1)
 
     if inverse:
         circuit = circuit.inverse()
@@ -53,7 +53,8 @@ def qaft(
     state_vector = result.get_statevector()
 
     # Perfect QFT simulation
-    perfect_qft = QFT(num_qubits=num_qubits, approximation_degree=0, do_swaps=do_swaps, inverse=inverse, insert_barriers=insert_barriers)
+    perfect_qft = QFT(num_qubits=num_qubits, approximation_degree=0, do_swaps=do_swaps,
+                      inverse=inverse, insert_barriers=insert_barriers)
 
     backend = Aer.get_backend('aer_simulator_statevector')
     perfect_result = execute(perfect_qft, backend).result()
@@ -64,4 +65,3 @@ def qaft(
     fidelity = state_fidelity(state_vector, perfect_state_vector)
 
     return qasm_result, fidelity
-
