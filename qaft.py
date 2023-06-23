@@ -3,7 +3,7 @@ import numpy as np
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QFT
 from qiskit import Aer, execute
-from qiskit.quantum_info import state_fidelity
+from qiskit.quantum_info import Operator, process_fidelity
 from typing import Optional
 
 
@@ -45,23 +45,28 @@ def qaft(
     if inverse:
         circuit = circuit.inverse()
 
-    qasm_result = circuit.decompose().qasm()
+    # qasm_result = circuit.decompose().qasm()
 
-    # AQFT simulation
-    backend = Aer.get_backend('aer_simulator_statevector')
-    result = execute(circuit, backend).result()
-    state_vector = result.get_statevector()
+    backend = Aer.get_backend('unitary_simulator')
+    job = execute(circuit, backend)
+    result = job.result()
+    U = result.get_unitary(circuit)
 
     # Perfect QFT simulation
     perfect_qft = QFT(num_qubits=num_qubits, approximation_degree=0, do_swaps=do_swaps,
                       inverse=inverse, insert_barriers=insert_barriers)
 
-    backend = Aer.get_backend('aer_simulator_statevector')
-    perfect_result = execute(perfect_qft, backend).result()
-    perfect_state_vector = perfect_result.get_statevector()
+    backend = Aer.get_backend('unitary_simulator')
+    job = execute(perfect_qft, backend)
+    result = job.result()
+    V = result.get_unitary(perfect_qft)
 
-    print(state_vector, perfect_state_vector)
+    # Compute process fidelity
+    infidelity = process_fidelity(U, V)
 
-    fidelity = state_fidelity(state_vector, perfect_state_vector)
+    #U = np.matrix(U.data)
+    #V = np.matrix(V.data)
+    #infidelity_2 = 1 - np.trace(U @ V.H) / num_qubits
+    #print(infidelity_2)
 
-    return qasm_result, fidelity
+    return infidelity

@@ -11,7 +11,7 @@ with open('input.json') as fin:
     inverse = input_data['inverse']
     insert_barriers = input_data['insert_barriers']
 
-    qasm_result, fidelity = qaft(num_qubits, approximation_degree, do_swaps, inverse, insert_barriers)
+    infidelity = qaft(num_qubits, approximation_degree, do_swaps, inverse, insert_barriers)
 
 with open('output.json', 'w') as fout:
-    json.dump({'qasm_result': qasm_result, 'fidelity': fidelity}, fout)
+    json.dump({'infidelity': infidelity}, fout)
