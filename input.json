@@ -3,5 +3,6 @@
   "approximation_degree": 1,
   "do_swaps": true,
   "inverse": false,
-  "insert_barriers": false
+  "insert_barriers": false,
+  "qc_output_filename": "qc_aqft.qasm"
 }

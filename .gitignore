@@ -157,3 +157,4 @@ cython_debug/
 *.docx
 *.xml
 *.iml
+*.qasm

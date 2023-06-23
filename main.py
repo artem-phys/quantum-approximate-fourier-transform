@@ -10,8 +10,12 @@ with open('input.json') as fin:
     do_swaps = input_data['do_swaps']
     inverse = input_data['inverse']
     insert_barriers = input_data['insert_barriers']
+    qc_output_filename = input_data['qc_output_filename']
 
-    infidelity = qaft(num_qubits, approximation_degree, do_swaps, inverse, insert_barriers)
+    infidelity, qasm_code = qaft(num_qubits, approximation_degree, do_swaps, inverse, insert_barriers)
 
 with open('output.json', 'w') as fout:
     json.dump({'infidelity': infidelity}, fout)
+
+with open(qc_output_filename, 'w') as fout2:
+    fout2.write(qasm_code)

@@ -3,7 +3,7 @@ import numpy as np
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QFT
 from qiskit import Aer, execute
-from qiskit.quantum_info import Operator, process_fidelity
+from qiskit.quantum_info import process_fidelity
 from typing import Optional
 
 
@@ -45,12 +45,12 @@ def qaft(
     if inverse:
         circuit = circuit.inverse()
 
-    # qasm_result = circuit.decompose().qasm()
+    qasm_code = circuit.decompose().qasm()
 
     backend = Aer.get_backend('unitary_simulator')
     job = execute(circuit, backend)
     result = job.result()
-    U = result.get_unitary(circuit)
+    u = result.get_unitary(circuit)
 
     # Perfect QFT simulation
     perfect_qft = QFT(num_qubits=num_qubits, approximation_degree=0, do_swaps=do_swaps,
@@ -59,14 +59,9 @@ def qaft(
     backend = Aer.get_backend('unitary_simulator')
     job = execute(perfect_qft, backend)
     result = job.result()
-    V = result.get_unitary(perfect_qft)
+    v = result.get_unitary(perfect_qft)
 
     # Compute process fidelity
-    infidelity = 1 - process_fidelity(U, V)
+    infidelity = 1 - process_fidelity(u, v)
 
-    #U = np.matrix(U.data)
-    #V = np.matrix(V.data)
-    #infidelity_2 = 1 - np.trace(U @ V.H) / num_qubits
-    #print(infidelity_2)
-
-    return infidelity
+    return infidelity, qasm_code
