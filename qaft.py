@@ -62,7 +62,7 @@ def qaft(
     V = result.get_unitary(perfect_qft)
 
     # Compute process fidelity
-    infidelity = process_fidelity(U, V)
+    infidelity = 1 - process_fidelity(U, V)
 
     #U = np.matrix(U.data)
     #V = np.matrix(V.data)
