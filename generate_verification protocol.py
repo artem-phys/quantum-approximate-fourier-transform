@@ -2,13 +2,11 @@ import itertools
 
 from qaft import qaft
 
-max_qubits_number = 4
-
-num_qubits_list = list(range(2, max_qubits_number))
-approximation_degree_list = list(range(1, 7))
+num_qubits_list = [5]
+approximation_degree_list = [0, 1, 4]
 do_swaps_list = [False, True]
 inverse_list = [False, True]
-insert_barriers_list = [False, True]
+insert_barriers_list = [False]
 
 parameters_lists = [
    num_qubits_list,
